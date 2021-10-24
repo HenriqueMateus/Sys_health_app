@@ -3,8 +3,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sys_health_app/components/Editor.dart';
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
+import 'package:sys_health_app/database/AlaDao.dart';
 import 'package:sys_health_app/database/MedicoDao.dart';
 import 'package:sys_health_app/database/PacienteDao.dart';
+import 'package:sys_health_app/models/Ala.dart';
+import 'package:sys_health_app/models/Fila.dart';
 import 'package:sys_health_app/models/Medico.dart';
 import 'package:sys_health_app/models/MedicoViewModel.dart';
 import 'package:sys_health_app/models/Usuario.dart';
@@ -22,8 +25,42 @@ class _RegisterAlasState extends State<RegisterAlas> {
       .listar();
   late final TextEditingController _controleNome;
   late final TextEditingController _controleDescricao;
-  late final TextEditingController _controleExemploDrop;
-  late final TextEditingController _controleMedicos;
+  late final TextEditingController _controleTamanhoMaximo;
+  late final TextEditingController _controleTotalFila;
+  late final TextEditingController _controleQuantMaxMedicos;
+  String idAla = '';
+  List<Fila> filas = <Fila>[];
+  List<Medico> medicos = <Medico>[];
+  bool editar = false;
+  void cadastrarAlas(){
+    Ala? ala;
+    int tamanhoMax = int.parse(_controleTamanhoMaximo.text);
+    int totalMaxFila = int.parse(_controleTotalFila.text);
+    int quantiMaxMedico = int.parse(_controleQuantMaxMedicos.text);
+    AlaDao alaDao = AlaDao(FirebaseDatabase.instance.reference().child("Alas"));
+    if(!editar){
+      ala = Ala(_controleNome.text,
+          _controleDescricao.text,
+          tamanhoMax,
+          totalMaxFila,
+          quantiMaxMedico
+      );
+      alaDao.cadastrar(ala);
+    } else {
+      ala = Ala.id(
+          idAla,
+          _controleNome.text,
+          _controleDescricao.text,
+          tamanhoMax,
+          totalMaxFila,
+          quantiMaxMedico,
+          filas,
+          medicos
+      );
+      alaDao.alterar(ala);
+    }
+    Navigator.of(context).pop();
+  }
 
   void _loadDataMedicos() async {
 
@@ -54,26 +91,16 @@ class _RegisterAlasState extends State<RegisterAlas> {
       });
     });
   }
-  var items = [
-    'Working a lot harder',
-    'Being a lot smarter',
-    'Being a self-starter',
-    'Placed in charge of trading charter'
-  ];
-  List<Medico> medicos = <Medico>[];
+
   @override
   void initState() {
     super.initState();
     _controleNome = TextEditingController();
     _controleDescricao = TextEditingController();
-    _controleExemploDrop = TextEditingController();
-    _controleMedicos = TextEditingController();
+    _controleTamanhoMaximo = TextEditingController();
+    _controleTotalFila = TextEditingController();
+    _controleQuantMaxMedicos = TextEditingController();
 
-
-    Future.delayed(Duration(milliseconds: 6000), () {
-      _loadDataMedicos();
-      print(medicos);
-    });
   }
 
   @override
@@ -98,15 +125,20 @@ class _RegisterAlasState extends State<RegisterAlas> {
                 tipe: TextInputType.text),
             Editor(
                 controlador: _controleDescricao,
-                rotulo: "Classificação",
-                dica: "dica",
-                tipe: TextInputType.text),
-            Editor(
-                controlador: _controleDescricao,
                 rotulo: "Quantidade Máxima de Pacientes",
                 dica: "dica",
                 tipe: TextInputType.number),
-
+            Editor(
+                controlador: _controleTotalFila,
+                rotulo: "Quantidade Máxima de Filas",
+                dica: "dica",
+                tipe: TextInputType.number),
+            Editor(
+                controlador: _controleQuantMaxMedicos,
+                rotulo: "Quantidade Máxima de Medicos",
+                dica: "dica",
+                tipe: TextInputType.number),
+            ElevatedButton(onPressed: cadastrarAlas, child: Text('confirmar'))
           ],
         ),
       ),

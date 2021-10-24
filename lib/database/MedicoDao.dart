@@ -4,8 +4,7 @@ import 'package:sys_health_app/models/Medico.dart';
 
 class MedicoDao implements DAO<Medico> {
 
-  @override
-  late DatabaseReference __ref;
+  DatabaseReference __ref;
 
   MedicoDao(this.__ref);
 
@@ -17,6 +16,16 @@ class MedicoDao implements DAO<Medico> {
   @override
   Query listar() {
     return __ref;
+  }
+
+  @override
+  void alterar(Medico value) {
+    __ref.child(value.idMedico).update(value.toJson());
+  }
+
+  @override
+  void remover(Medico value) {
+    __ref.child(value.idMedico).remove();
   }
 
 
