@@ -4,9 +4,8 @@ import 'package:sys_health_app/models/Medico.dart';
 
 class MedicoDao implements DAO<Medico> {
 
-  DatabaseReference __ref;
-
-  MedicoDao(this.__ref);
+  DatabaseReference __ref = FirebaseDatabase
+      .instance.reference().child('Medicos');
 
   @override
   void cadastrar(Medico medico) {

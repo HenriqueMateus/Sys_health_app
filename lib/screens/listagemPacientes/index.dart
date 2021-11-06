@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:sys_health_app/AppRoutes.dart';
 import 'package:sys_health_app/database/PacienteDao.dart';
 import 'package:sys_health_app/models/Paciente.dart';
-import 'package:autocomplete_textfield/autocomplete_textfield.dart';
+
 
 class ListagemPacientes extends StatefulWidget {
   const ListagemPacientes({Key? key}) : super(key: key);
@@ -15,7 +15,7 @@ class ListagemPacientes extends StatefulWidget {
 }
 
 class _ListagemPacientesState extends State<ListagemPacientes> {
-  final dbRef = PacienteDao().listarPaciente();
+  final dbRef = PacienteDao().listar();
   List<Paciente> pacientes = <Paciente>[];
   void _recuperPacientes() async {
     await dbRef.once().then((DataSnapshot snapshot) {
@@ -48,7 +48,7 @@ class _ListagemPacientesState extends State<ListagemPacientes> {
     });
   }
   void excluirPaciente(Paciente paciente){
-    PacienteDao().excluirPaciente(paciente);
+    PacienteDao().remover(paciente);
     _recuperPacientes();
   }
   @override

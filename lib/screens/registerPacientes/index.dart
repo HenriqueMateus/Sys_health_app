@@ -39,7 +39,7 @@ class _RegisterPacientesState extends State<RegisterPacientes> {
         _controleRG.text
     );
     if(!editar){
-      PacienteDao().cadastrarPaciente(paciente);
+      PacienteDao().cadastrar(paciente);
     } else {
       final pacienteId = Paciente.id(
           idPaciente,
@@ -54,7 +54,7 @@ class _RegisterPacientesState extends State<RegisterPacientes> {
           _controleCPF.text,
           _controleRG.text
       );
-      PacienteDao().alterarPaciente(pacienteId);
+      PacienteDao().alterar(pacienteId);
     }
     Navigator.of(context).pop();
 
@@ -69,7 +69,7 @@ class _RegisterPacientesState extends State<RegisterPacientes> {
     _controleEndereco.text = paciente.endereco;
     _controleRG.text = paciente.rg;
     _controleCPF.text = paciente.cpf;
-    sexo = paciente.sexo;
+    _controleSexo.text = paciente.sexo;
     _controleDataNacimento.text = paciente.dataNasc;
   }
   @override
@@ -81,7 +81,8 @@ class _RegisterPacientesState extends State<RegisterPacientes> {
   @override
   Widget build(BuildContext context) {
 
-    final paciente = ModalRoute.of(context)?.settings.arguments != null? ModalRoute.of(context)?.settings.arguments as Paciente: null;
+    final paciente = ModalRoute.of(context)?.settings.arguments != null?
+    ModalRoute.of(context)?.settings.arguments as Paciente: null;
     if(paciente != null){
       editar = true;
       _LoadForm(paciente);

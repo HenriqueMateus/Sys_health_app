@@ -2,9 +2,12 @@ import 'dart:convert';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:sys_health_app/AppRoutes.dart';
 import 'package:sys_health_app/database/MedicoDao.dart';
 import 'package:sys_health_app/models/Medico.dart';
+import 'package:sys_health_app/models/Usuario.dart';
 import 'package:sys_health_app/screens/registerMedicos/index.dart';
+
 class ListagemMedicos extends StatefulWidget {
   const ListagemMedicos({Key? key}) : super(key: key);
 
@@ -13,9 +16,48 @@ class ListagemMedicos extends StatefulWidget {
 }
 
 class _ListagemMedicosState extends State<ListagemMedicos> {
-  final dbRef = MedicoDao(FirebaseDatabase.instance.reference().child('Medico'))
-      .listar();
+
+  final dbRef = MedicoDao().listar();
+
   List<Medico> _medicos = [];
+  void _recuperarMedicos() async {
+    await dbRef.once().then((DataSnapshot snapshot) {
+      setState(() {
+        _medicos = <Medico>[];
+        if (snapshot.value != null) {
+          var dbTask = Map<String, dynamic>.from(snapshot.value);
+          dbTask.forEach((key, value) {
+            Usuario usuario = Usuario(
+              value['usuario']['email'], value['usuario']['senha']
+            );
+            _medicos.add(Medico.id(
+                key,
+                value['crm'],
+                value['nome'],
+                value['sobrenome'],
+                value['dataNasc'],
+                value['endereco'],
+                value['sexo'],
+                value['cpf'],
+                value['rg'],
+                usuario));
+          });
+        }
+      });
+    });
+  }
+
+  void excluirMedico(Medico medico){
+    MedicoDao().remover(medico);
+  }
+
+  @override
+  initState() {
+    super.initState();
+    Future.delayed(Duration(milliseconds: 6000), () {
+      _recuperarMedicos();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,62 +70,70 @@ class _ListagemMedicosState extends State<ListagemMedicos> {
           backgroundColor: Colors.lightBlueAccent,
           foregroundColor: Colors.white,
           child: Icon(Icons.add),
-          onPressed: (){
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const RegisterMedicos()));
-          }
-      ),
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const RegisterMedicos()));
+          }),
       body: Column(
         children: [
-          FutureBuilder(
-              future: dbRef.once(),
-              builder: (context, AsyncSnapshot<DataSnapshot> snapshot) {
-                if (snapshot.hasData) {
-                  var lists = [];
-
-                  if(snapshot.data != null){
-                    Map<dynamic, dynamic> values = snapshot.data!.value;
-                    values.forEach((key, values) {
-                      lists.add(values);
-                    });
-                  }
-
-                  return new ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: lists.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        String _nome = "Nome: ${lists[index]['nome']} ${lists[index]['sobrenome']}" ;
-                        return Card(
-                          child:  Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              Title(color: Colors.black,
-                                  child: Text(_nome),
-                              )
-                              ,
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  TextButton(
-                                    child: const Text('Editar'),
-                                    onPressed: () {/* ... */},
-                                  ),
-                                  const SizedBox(width: 8),
-                                  TextButton(
-                                    child: const Text('Excluir'),
-                                    onPressed: () {/* ... */},
-                                  ),
-                                  const SizedBox(width: 8),
-                                ],
-                              ),
-                            ],
-                          ),
-
-                        );
-                      });
-                }
-                return CircularProgressIndicator();
-              })
+          Expanded(
+              child: Padding(
+            padding: EdgeInsets.only(left: 30),
+            child: _medicos.length > 0
+                ? ListView.builder(
+                    itemCount: _medicos.length,
+                    itemBuilder: (context, index) {
+                      Medico medico = _medicos[index];
+                      String _nome = "Nome: ${medico.nome} ${medico.sobrenome}";
+                      return Card(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Title(
+                              color: Colors.black,
+                              child: Text(_nome),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                TextButton(
+                                  child: const Text('Editar'),
+                                  onPressed: () {
+                                    Navigator.of(context).pushNamed(
+                                      AppRoutes.FORMMEDICO, arguments: medico
+                                    ).then((value) =>
+                                        _recuperarMedicos()
+                                    );
+                                  },
+                                ),
+                                const SizedBox(width: 8),
+                                TextButton(
+                                  child: const Text('Excluir'),
+                                  onPressed: () {
+                                    excluirMedico(medico);
+                                  },
+                                ),
+                                const SizedBox(width: 8),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  )
+                : Padding(
+                    padding: const EdgeInsets.only(top: 20.0),
+                    child: Text(
+                      "Nenhum Médico Encontrado",
+                      style: TextStyle(
+                        color: Theme.of(context).bottomAppBarColor,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
+          ))
         ],
       ),
     );

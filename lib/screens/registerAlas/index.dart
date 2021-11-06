@@ -2,7 +2,6 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sys_health_app/components/Editor.dart';
-import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:sys_health_app/database/AlaDao.dart';
 import 'package:sys_health_app/database/MedicoDao.dart';
 import 'package:sys_health_app/database/PacienteDao.dart';
@@ -20,8 +19,7 @@ class RegisterAlas extends StatefulWidget {
 }
 
 class _RegisterAlasState extends State<RegisterAlas> {
-  final dbRef = MedicoDao(FirebaseDatabase.instance.reference()
-      .child('Medicos'))
+  final dbRef = MedicoDao()
       .listar();
   late final TextEditingController _controleNome;
   late final TextEditingController _controleDescricao;

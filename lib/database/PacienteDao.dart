@@ -1,19 +1,28 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:sys_health_app/database/DAO.dart';
 import 'package:sys_health_app/models/Paciente.dart';
 
-class PacienteDao {
-  final DatabaseReference __pacienteRef =
+class PacienteDao implements DAO<Paciente> {
+  final DatabaseReference __ref =
   FirebaseDatabase.instance.reference().child('Paciente');
-  void cadastrarPaciente(Paciente paciente){
-    __pacienteRef.push().set(paciente.toJson());
+
+  @override
+  void alterar(Paciente value) {
+    __ref.child(value.idPaciente).update(value.toJson());
   }
-  Query listarPaciente(){
-    return __pacienteRef;
+
+  @override
+  void cadastrar(Paciente value) {
+    __ref.push().set(value.toJson());
   }
-  void alterarPaciente(Paciente paciente){
-    __pacienteRef.child(paciente.idPaciente).update(paciente.toJson());
+
+  @override
+  Query listar() {
+    return __ref;
   }
-  void excluirPaciente(Paciente paciente){
-    __pacienteRef.child(paciente.idPaciente).remove();
+
+  @override
+  void remover(Paciente value) {
+    __ref.child(value.idPaciente).remove();
   }
 }

@@ -25,10 +25,13 @@ class _RegisterMedicosState extends State<RegisterMedicos> {
   final TextEditingController _controleEmail = TextEditingController();
   final TextEditingController _controleSexo = TextEditingController();
   final TextEditingController _controleSenha = TextEditingController();
+  var sexo = ['Masculino','Feminino','Outros'];
+  String idMedico = '';
   String _chosenValue = '';
+  bool editar = false;
   void registerEnter() {
     Usuario usuario = new Usuario(_controleEmail.text, _controleSenha.text);
-    final medico = Medico(
+    Medico? medico = Medico(
         _controleCRM.text,
         _controleNome.text,
         _controleSobrenome.text,
@@ -37,19 +40,43 @@ class _RegisterMedicosState extends State<RegisterMedicos> {
         _chosenValue,
         _controleCPF.text,
         _controleRG.text,
-        usuario
-    );
+        usuario);
+    if (!editar) {
+      MedicoDao().cadastrar(medico);
+    } else {
+      medico.idMedico = idMedico;
+      print(medico.toJson());
+      MedicoDao().alterar(medico);
+    }
+  }
 
-    MedicoDao(FirebaseDatabase.instance.reference().child('Medicos'))
-        .cadastrar(medico);
+  void _LoadForm(Medico medico) {
+    idMedico = medico.idMedico;
+    _controleCRM.text = medico.crm;
+    _controleNome.text = medico.nome;
+    _controleSobrenome.text = medico.sobrenome;
+    _controleDataNacimento.text = medico.dataNasc;
+    _controleEndereco.text = medico.endereco;
+    _controleSexo.text = medico.sexo;
+    _controleCPF.text = medico.cpf;
+    _controleRG.text = medico.rg;
+    _controleEmail.text = medico.usuario.email;
+    _controleSenha.text = medico.usuario.senha;
   }
 
   @override
   Widget build(BuildContext context) {
+    final medico = ModalRoute.of(context)?.settings.arguments != null
+        ? ModalRoute.of(context)?.settings.arguments as Medico
+        : null;
+    if (medico != null) {
+      editar = true;
+      _LoadForm(medico);
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Cadastro"),
-
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -92,38 +119,24 @@ class _RegisterMedicosState extends State<RegisterMedicos> {
                 dica: '',
                 icone: Icons.perm_identity,
                 tipe: TextInputType.datetime),
-
-            PaddingLabelWithWidget(
-              textPadding: EdgeInsets.only(left: 100, top: 20, right: 10),
-              label: Text("Sexo"),
-              child: DropdownButton<String>(
-                value: _chosenValue,
-                //elevation: 5,
-                style: TextStyle(color: Colors.black),
-
-                items: <String>[
-                  '',
-                  'Masculino',
-                  'Feminino',
-                  'Outros'
-                ].map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                hint: Text(
-                  "Please choose a langauage",
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600),
-                ),
-                onChanged: (String? value) {
-                  setState(() {
-                    _chosenValue = value!;
-                  });
-                },
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: TextField(
+                controller: _controleSexo,
+                decoration: InputDecoration(
+                    labelText: "Sexo",
+                    suffixIcon: PopupMenuButton<String>(
+                      icon: const Icon(Icons.arrow_drop_down),
+                      onSelected: (String value) {
+                        _controleSexo.text = value;
+                      },
+                      itemBuilder: (BuildContext context) {
+                        return sexo.map<PopupMenuItem<String>>((String value) {
+                          return new PopupMenuItem(
+                              child: new Text(value), value: value);
+                        }).toList();
+                      },
+                    )),
               ),
             ),
             Editor(
@@ -144,7 +157,6 @@ class _RegisterMedicosState extends State<RegisterMedicos> {
                 dica: '',
                 icone: Icons.password,
                 tipe: TextInputType.visiblePassword),
-
             ElevatedButton(onPressed: registerEnter, child: Text('confirmar'))
           ],
         ),
