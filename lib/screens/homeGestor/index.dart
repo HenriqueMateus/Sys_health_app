@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sys_health_app/screens/listagemMedicos/index.dart';
 import 'package:sys_health_app/screens/registerAlas/index.dart';
-
+import 'package:sys_health_app/screens/listagemAlas/index.dart';
 class HomeGestor extends StatefulWidget {
   const HomeGestor({Key? key}) : super(key: key);
 
@@ -19,7 +19,7 @@ class _HomeGestorState extends State<HomeGestor> {
       body: PageView(
         controller: pagina,
         children: [
-          RegisterAlas(),
+          ListagemAlas(responsavel: 'gestor'),
           ListagemMedicos()
         ],
       ),

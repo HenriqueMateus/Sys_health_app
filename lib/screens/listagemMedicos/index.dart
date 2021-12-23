@@ -51,10 +51,11 @@ class _ListagemMedicosState extends State<ListagemMedicos> {
     MedicoDao().remover(medico);
   }
 
+
   @override
   initState() {
     super.initState();
-    Future.delayed(Duration(milliseconds: 6000), () {
+    Future.delayed(Duration(milliseconds: 45), () {
       _recuperarMedicos();
     });
   }

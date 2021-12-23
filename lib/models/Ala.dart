@@ -1,8 +1,6 @@
 
 
 import 'package:sys_health_app/models/Paciente.dart';
-
-import 'Fila.dart';
 import 'Medico.dart';
 
 class Ala {
@@ -12,13 +10,13 @@ class Ala {
   final int tamanhoMaximo;
   final int totalFilas;
   final int quantidadeMaximaMedicos;
-  List<Fila> filas;
+  List<List<Paciente>> filas;
   List<Medico> medicos;
   var id;
   Ala(this.nome, this.descricao, this.tamanhoMaximo, this.totalFilas,
       this.quantidadeMaximaMedicos):
-    this.filas = List<Fila>.generate(totalFilas, (index) => Fila("$index")),
-    this.medicos = <Medico>[];
+    this.filas = List.generate(totalFilas, (index) =>  new List.empty(growable: true)),
+    this.medicos = [];
 
 
   Ala.id(this.id, this.nome, this.descricao, this.tamanhoMaximo, this.totalFilas,

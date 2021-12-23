@@ -19,6 +19,10 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: AppBar(
+          title: Text("SisHealth"),
+          backgroundColor: Colors.deepPurpleAccent,
+        ),
         body: PageView(
           controller: page,
           children: [

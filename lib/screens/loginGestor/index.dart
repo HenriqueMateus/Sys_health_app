@@ -12,9 +12,7 @@ class _LoginGestorState extends State<LoginGestor> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Gestor"),
-        ),
+
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,

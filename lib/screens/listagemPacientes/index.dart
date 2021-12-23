@@ -54,7 +54,7 @@ class _ListagemPacientesState extends State<ListagemPacientes> {
   @override
   initState(){
     super.initState();
-    Future.delayed( Duration(milliseconds: 6000), () {
+    Future.delayed( Duration(milliseconds: 45), () {
       _recuperPacientes();
     });
   }

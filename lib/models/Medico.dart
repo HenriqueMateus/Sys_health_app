@@ -20,7 +20,8 @@ class Medico extends Pessoa{
   }
   Medico.fromJson(Map<String, dynamic> json)
       : this.crm = json['crm'],
-        this.usuario = json['usuario'],
+        this.usuario = new Usuario(json['usuario']['email'],
+              json['usuario']['senha']),
         super(json['nome'], json['sobrenome'], json['dataNasc']
           , json['endereco'], json['sexo'], json['cpf'], json['rg'],
   );

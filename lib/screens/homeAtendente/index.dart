@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sys_health_app/screens/listagemAlas/index.dart';
 import 'package:sys_health_app/screens/listagemMedicos/index.dart';
 import 'package:sys_health_app/screens/listagemPacientes/index.dart';
 
@@ -20,12 +21,7 @@ class _HomeAtendenteState extends State<HomeAtendente> {
             controller: pagina,
             children: [
               ListagemPacientes(),
-              Scaffold(
-                  appBar: AppBar(
-                    title: Text('ALAS'),
-                    backgroundColor: Colors.deepPurpleAccent,
-                  )
-              ),
+              ListagemAlas(),
 
             ],
           ),
